@@ -140,18 +140,13 @@ library SafeMath {
 contract Vesting {
     using SafeMath for uint256;
     VestingToken public vestToken;
-    struct Founder{
-        uint amt;
-        uint maturity;
-        bool paid;
-    }
+
     struct Emp{
         uint amt;
-        uint maturity;
         bool paid;
     }
     mapping(address => uint256) public balanceOf;
-    mapping(address => Founder) public founders;
+   // mapping(address => Founder) public founders;
     mapping(address => Emp) public emps;
     address public admin;
     //uint transactionValue;
@@ -181,16 +176,16 @@ contract Vesting {
     //     founders[_founder] = Founder(transactionValue, block.timestamp + _maturity, false);
     // }
     
-    function addEmp(address _emp, uint _maturity, uint amt) external payable{
+    function addEmp(address _emp, uint amt) external payable{
         require(msg.sender == admin, "only admin allowed");
         require(emps[_emp].amt == 0,"emp aldready exists");
-        emps[_emp] = Emp(amt, block.timestamp + _maturity, false);
+        emps[_emp] = Emp(amt, false);
     }
 
     function withdraw(address _emp) external payable{   
         Emp storage emp = emps[_emp];
         //Founder storage founder = founders[msg.sender];
-        require(emp.maturity <= block.timestamp, "too early");
+        //require(emp.maturity <= block.timestamp, "too early");
         require(emp.paid == false,"aldready paid");
         //emp.paid = true;
         uint256 amount = _availableDrawDownAmount(_emp);
@@ -235,7 +230,7 @@ contract Vesting {
         return block.timestamp;
     }
 
-    function getvestBalance() public view returns (uint256) {
+    function getBalance() public view returns (uint256) {
         return vestToken.balanceOf(address(this));
     }
 
